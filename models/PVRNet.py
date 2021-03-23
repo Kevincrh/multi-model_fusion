@@ -61,7 +61,7 @@ class PVRNet(nn.Module):
 
         # Discriminator for Adversarial Learning
         self.DIS_model_discrim = nn.Sequential(
-            nn.Linear(self.hidden_size, 64),
+            nn.Linear(self.fea_dim, 64),
             nn.LeakyReLU(0.2, inplace=True),
             nn.Linear(64, 16),
             nn.Tanh(),
@@ -163,7 +163,7 @@ class PVRNet(nn.Module):
             y_1 = F.leaky_relu(self.GEN_EN_norm2(self.GEN_EN_drop(self.GEN_EN_linear_1(normed))))
             y_2 = F.leaky_relu(self.GEN_EN_norm3(self.GEN_EN_drop(self.GEN_EN_linear_2(y_1))))
             y_2 = F.leaky_relu(self.GEN_EN_norm(self.GEN_EN_drop(self.GEN_EN_linear_3(y_2))))
-            y_3 = F.tanh(self.GEN_EN_linear_4(y_2))
+            y_3 = torch.tanh(self.GEN_EN_linear_4(y_2))
             encoder_out.append(y_3)
 
         # decoder
@@ -183,7 +183,7 @@ class PVRNet(nn.Module):
         for encoded_fea in encoder_out:
             normed = self.CLS_norm(encoded_fea)
             dropped = self.CLS_drop(normed)
-            y_1 = self.CLS_drop(F.tanh(self.CLS_linear_1(dropped)))
+            y_1 = self.CLS_drop(torch.tanh(self.CLS_linear_1(dropped)))
             y_2 = F.softmax(self.CLS_linear_2(y_1), 1)
             classifier_out.append(y_2)
 
